@@ -1,6 +1,21 @@
 zstyle ":completion:*:commands" rehash 1
 
-PROMPT="%F{green}%n%f %F{cyan}($(arch))%f:%F{blue}%~%f"$'\n'"%# "
+# Find and set branch name var if in git repository.
+function git_branch_name()
+{
+  branch=$(git symbolic-ref HEAD 2> /dev/null | awk 'BEGIN{FS="/"} {print $NF}')
+  if [[ $branch == "" ]];
+  then
+    :
+  else
+    echo '- ('$branch')'
+  fi
+}
+
+# Enable substitution in the prompt.
+setopt prompt_subst
+
+PROMPT="%F{green}%n%f %F{cyan}($(arch))%f:%F{blue}%~%f"$(git_branch_name)$'\n'"%# "
 
 # History設定
 HISTFILE=~/.zsh_history
