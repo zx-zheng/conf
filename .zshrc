@@ -1,21 +1,17 @@
 zstyle ":completion:*:commands" rehash 1
 
-# Find and set branch name var if in git repository.
-function git_branch_name()
-{
-  branch=$(git symbolic-ref HEAD 2> /dev/null | awk 'BEGIN{FS="/"} {print $NF}')
-  if [[ $branch == "" ]];
-  then
-    :
-  else
-    echo '- ('$branch')'
-  fi
-}
+# Load version control information
+autoload -Uz vcs_info
+precmd() { vcs_info }
+
+# Format the vcs_info_msg_0_ variable
+zstyle ':vcs_info:git:*' formats ' on branch %b'
 
 # Enable substitution in the prompt.
 setopt prompt_subst
 
-PROMPT="%F{green}%n%f %F{cyan}($(arch))%f:%F{blue}%~%f"$(git_branch_name)$'\n'"%# "
+PROMPT="%F{green}%n%f %F%D{%Y-%m-%d %H:%M:%S} %F{cyan}($(arch))%f:%F{blue}%~%f"'${vcs_info_msg_0_}'$'\n'"%# "
+RPROMPT=
 
 # History設定
 HISTFILE=~/.zsh_history
@@ -49,3 +45,9 @@ bindkey '^r' peco-select-history
 export PYENV_ROOT="$HOME/.pyenv"
 command -v pyenv >/dev/null || export PATH="$PYENV_ROOT/bin:$PATH"
 eval "$(pyenv init -)"
+
+# The next line updates PATH for the Google Cloud SDK.
+if [ -f '/Users/01036954/google-cloud-sdk/path.zsh.inc' ]; then . '/Users/01036954/google-cloud-sdk/path.zsh.inc'; fi
+
+# The next line enables shell command completion for gcloud.
+if [ -f '/Users/01036954/google-cloud-sdk/completion.zsh.inc' ]; then . '/Users/01036954/google-cloud-sdk/completion.zsh.inc'; fi
